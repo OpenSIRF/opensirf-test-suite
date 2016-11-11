@@ -21,8 +21,13 @@ credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
 publishMavenStyle := false
 isSnapshot := true
 
+unmanagedClasspath in Test += baseDirectory.value / "WebContent" / "WEB-INF" / "classes"
+
+fork in Test := true
+
 libraryDependencies += "org.glassfish.jersey.core" % "jersey-client" % "2.22.2"
 libraryDependencies += "org.opensirf" % "opensirf-java-client" % "1.0.0" changing()
+//libraryDependencies += "org.opensirf" % "opensirf-jax-rs" % "1.0.0" changing()
 libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % Test
 
 publishArtifact in (Compile, packageDoc) := false

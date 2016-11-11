@@ -46,6 +46,7 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.opensirf.catalog.SIRFCatalog;
 import org.opensirf.container.ProvenanceInformation;
+import org.opensirf.container.MagicObject;
 import org.opensirf.obj.PackagingFormat;
 import org.opensirf.obj.PreservationObjectIdentifier;
 import org.opensirf.obj.PreservationObjectInformation;
@@ -56,13 +57,13 @@ import org.opensirf.obj.PreservationObjectVersionIdentifier;
  *
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class ClientAndServerTest {
+public class BasicApiAndClientTest {
 	
 	private Properties props;
 	
 	private static String testContainerName = "unitTestContainer";
 	private static String testPOuuid = "unitTestPO";
-	private static String endpoint = "200.144.189.109:8088";
+	private static String endpoint = "127.0.0.1:8080";
 	private static SirfClient cli = new SirfClient(endpoint);
 	
 	@BeforeClass
@@ -183,6 +184,7 @@ public class ClientAndServerTest {
 		PreservationObjectInformation poi = catalog.getSirfObjects().get(testPOuuid);
 		Assert.assertNotNull(poi);
 		
+		// Deletes PO file and POI from catalog
 		Response r = cli.deletePreservationObject(testContainerName, testPOuuid);
 
 		// Checking PO is no longer there
@@ -190,7 +192,36 @@ public class ClientAndServerTest {
 		catalog = cli.getCatalog(testContainerName);
 		poi = catalog.getSirfObjects().get(testPOuuid);
 		Assert.assertNull(poi);
+		
+		byte[] po = cli.getPreservationObject(testContainerName, testPOuuid);	
+		Assert.assertNull(po);
 	}
+	
+	@Test
+	public void F_getMagicObject() {
+		System.out.println("-------------------------------------");
+		System.out.println("TEST CASE F: Retrieving magic object");
+		System.out.println("-------------------------------------");
+		
+		MagicObject mo = cli.getMagicObject(testContainerName);
+
+		Assert.assertEquals(mo.getContainerSpecification(), "1.0");
+		Assert.assertEquals(mo.getSirfCatalogId(), "catalog.json");		
+	}
+	
+	@Test
+	public void G_deleteContainer() {
+		System.out.println("-------------------------------------");
+		System.out.println("TEST CASE G: Deleting container");
+		System.out.println("-------------------------------------");
+		
+		cli.deleteContainer(testContainerName);
+
+		SIRFCatalog cat = cli.getCatalog(testContainerName);
+		Assert.assertNull(cat);
+	}
+	
+	
 	
 	private String getProperty(String prop) {
 		return props.getProperty(prop);
