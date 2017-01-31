@@ -202,7 +202,11 @@ public class BasicApiAndClientTest {
 		poi = catalog.getSirfObjects().get(testPOuuid);
 		Assert.assertNull(poi);
 		
-		byte[] po = cli.getPreservationObject(testContainerName, testPOuuid);	
+		byte[] po = cli.getPreservationObject(testContainerName, testPOuuid);
+		if(po != null) {
+			System.out.println("PO contents: " + new String(po));
+		}
+		
 		System.out.println("PO contents null: " + (po == null));
 		
 		Assert.assertNull(po);
